@@ -1,3 +1,5 @@
+versi bener dan suka 
+
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
@@ -206,7 +208,7 @@ if selected_kpi_code:
                     y=[target_feb] * len(x_clean),
                     mode='lines',
                     name='Target Feb',
-                    line=dict(color='blue', dash='dash')
+                    line=dict(color='yellow', dash='dash')
                 )
                 fig_detail.add_trace(target_feb_line)
 
