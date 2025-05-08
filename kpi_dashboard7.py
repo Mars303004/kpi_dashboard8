@@ -182,16 +182,21 @@ for i in range(0, len(table_df), cols_per_row):
     for j, row in enumerate(table_df.iloc[i:i+cols_per_row].itertuples()):
         if cols_buttons[j].button(f"Show Chart {row._1}", key=f"btn_{row._1}"):
             selected_kpi_code = row._1
+
 if selected_kpi_code:
     kpi_row = filtered_df[filtered_df['Kode KPI'] == selected_kpi_code].iloc[0]
     actual_feb = kpi_row['Actual Feb']
+
     if pd.isna(actual_feb) or str(actual_feb).strip().upper() == 'NA':
         st.info("Belum ada data yang tersedia untuk KPI ini.")
     else:
+        measurement_type = kpi_row['Measurement Type']
         target_tahunan = kpi_row['Target Tahunan']
         x_data = [col for col in df.columns if col.startswith('Actual')]
         y_data = kpi_row[x_data].values.tolist()
         x_clean = [col.replace('Actual ', '') for col in x_data]
+
+        # Garis target tahunan
         target_line = go.Scatter(
             x=x_clean,
             y=[target_tahunan] * len(x_clean),
@@ -199,20 +204,7 @@ if selected_kpi_code:
             name='Target Tahunan',
             line=dict(color='green', dash='dash')
         )
-    else:
-        target_feb = kpi_row['Target Feb']
-        x_data = [col for col in df.columns if col.startswith('Actual')]
-        y_data = kpi_row[x_data].values.tolist()
-        x_clean = [col.replace('Actual ', '') for col in x_data]
-        target_line = go.Scatter(
-            x=x_clean,
-            y=[target_feb] * len(x_clean),
-            mode='lines',
-            name='Target Feb',
-            line=dict(color='blue', dash='dash')
-        )
 
- 
         actual_line = go.Scatter(
             x=x_clean,
             y=y_data,
@@ -220,8 +212,22 @@ if selected_kpi_code:
             name='Kinerja Bulanan',
             line=dict(color='#0f098e')
         )
- 
-        fig_detail = go.Figure(data=[target_line, actual_line])
+
+        chart_data = [target_line, actual_line]
+
+        # Tambahkan garis Target Feb jika Measurement Type = SUM
+        if measurement_type == 'SUM':
+            target_feb = kpi_row['Target Feb']
+            target_feb_line = go.Scatter(
+                x=x_clean,
+                y=[target_feb] * len(x_clean),
+                mode='lines',
+                name='Target Feb',
+                line=dict(color='blue', dash='dash')
+            )
+            chart_data.insert(1, target_feb_line)  # Menempatkan di antara garis target tahunan dan aktual
+
+        fig_detail = go.Figure(data=chart_data)
         fig_detail.update_layout(
             xaxis_title='Bulan',
             yaxis_title='Nilai',
