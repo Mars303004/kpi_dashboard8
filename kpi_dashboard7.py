@@ -215,8 +215,8 @@ if selected_kpi_code:
 
         chart_data = [target_line, actual_line]
 
-        # Tambahkan garis Target Feb jika Measurement Type = SUM
-        if measurement_type == 'SUM':
+        # Tambahkan garis Target Feb jika YTD Achievement Type = SUM
+        if YTD_Achievement_Type == 'SUM':
             target_feb = kpi_row['Target Feb']
             target_feb_line = go.Scatter(
                 x=x_clean,
