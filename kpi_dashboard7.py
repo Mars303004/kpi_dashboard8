@@ -1,3 +1,5 @@
+versi bener dan suka 
+
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
@@ -180,10 +182,8 @@ cols_per_row = 4
 for i in range(0, len(table_df), cols_per_row):
     cols_buttons = st.columns(cols_per_row)
     for j, row in enumerate(table_df.iloc[i:i+cols_per_row].itertuples()):
-        # Use row[1] to reliably get 'Kode KPI'
-        if cols_buttons[j].button(f"Show Chart {row[1]}", key=f"btn_{row[1]}"):
-            selected_kpi_code = row[1]
-
+        if cols_buttons[j].button(f"Show Chart {row._1}", key=f"btn_{row._1}"):
+            selected_kpi_code = row._1
 if selected_kpi_code:
     kpi_row = filtered_df[filtered_df['Kode KPI'] == selected_kpi_code].iloc[0]
     actual_feb = kpi_row['Actual Feb']
@@ -194,23 +194,6 @@ if selected_kpi_code:
         x_data = [col for col in df.columns if col.startswith('Actual')]
         y_data = kpi_row[x_data].values.tolist()
         x_clean = [col.replace('Actual ', '') for col in x_data]
-
-        fig_detail = go.Figure()
-
-        # Add Target Feb line if Measurement Type is SUM and Target Feb is valid
-        if kpi_row['Measurement Type'] == 'SUM':
-            target_feb = kpi_row['Target Feb']
-            if pd.notna(target_feb):
-                target_feb_line = go.Scatter(
-                    x=x_clean,
-                    y=[target_feb] * len(x_clean),
-                    mode='lines',
-                    name='Target Feb',
-                    line=dict(color='blue', dash='dash')
-                )
-                fig_detail.add_trace(target_feb_line)
-
-        # Add Target Tahunan line (annual target)
         target_line = go.Scatter(
             x=x_clean,
             y=[target_tahunan] * len(x_clean),
@@ -218,9 +201,20 @@ if selected_kpi_code:
             name='Target Tahunan',
             line=dict(color='green', dash='dash')
         )
-        fig_detail.add_trace(target_line)
+    else:
+        target_feb = kpi_row['Target Feb']
+        x_data = [col for col in df.columns if col.startswith('Actual')]
+        y_data = kpi_row[x_data].values.tolist()
+        x_clean = [col.replace('Actual ', '') for col in x_data]
+        target_line = go.Scatter(
+            x=x_clean,
+            y=[target_feb] * len(x_clean),
+            mode='lines',
+            name='Target Feb',
+            line=dict(color='blue', dash='dash')
+        )
 
-        # Add actual performance line
+ 
         actual_line = go.Scatter(
             x=x_clean,
             y=y_data,
@@ -228,8 +222,8 @@ if selected_kpi_code:
             name='Kinerja Bulanan',
             line=dict(color='#0f098e')
         )
-        fig_detail.add_trace(actual_line)
-
+ 
+        fig_detail = go.Figure(data=[target_line, actual_line])
         fig_detail.update_layout(
             xaxis_title='Bulan',
             yaxis_title='Nilai',
