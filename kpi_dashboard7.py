@@ -122,14 +122,14 @@ st.markdown("<h3 style='color:#b42020;'>Filter Perspective (klik salah satu):</h
 st.markdown("""
 <style>
 button.persp-btn {
-    width: 100%;
-    height: 80px;
-    font-size: 1.5rem;
+    width: 500%;
+    height: 400px;
+    font-size: 3rem;
     color: white;
     background-color: #0f098e;
-    border-radius: 12px;
+    border-radius: 48px;
     border: 2px solid #b42020;
-    margin-bottom: 12px;
+    margin-bottom: 48px;
     cursor: pointer;
 }
 
